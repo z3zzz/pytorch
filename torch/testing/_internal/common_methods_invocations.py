@@ -10493,6 +10493,7 @@ op_db: List[OpInfo] = [
                torch.as_strided(x, size, stride, storage_offset=storage_offset),
            dtypes=all_types_and_complex_and(torch.bool, torch.float16, torch.bfloat16),
            supports_out=False,
+           supports_forward_ad=True,
            sample_inputs_func=sample_inputs_as_strided,
            skips=(
                # FIXME: AssertionError: False is not true : Tensors failed to compare as equal!
