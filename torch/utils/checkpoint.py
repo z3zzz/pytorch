@@ -1,7 +1,19 @@
 import torch
+from contextlib import contextmanager
 import warnings
 from typing import Any, Iterable, List, Tuple, Union
 
+
+@contextmanager
+def _mark_module_recomputing(function):
+    is_module = isinstance(function, torch.nn.Module)
+    try:
+        if is_module:
+            function._recomputing = True
+        yield
+    finally:
+        if is_module:
+            function._recomputing = False
 
 def detach_variable(inputs: Tuple[Any, ...]) -> Tuple[torch.Tensor, ...]:
     if isinstance(inputs, tuple):
@@ -357,7 +369,8 @@ def _checkpoint_without_reentrant(function, preserve_rng_state=True, *args):
                         set_device_states(fwd_gpu_devices, fwd_gpu_states)
                 with torch.enable_grad(), torch.cuda.amp.autocast(had_autocast_in_fwd):
                     with torch.autograd.graph.saved_tensors_hooks(inner_pack, inner_unpack):
-                        _unused = function(*args)
+                        with _mark_module_recomputing(function):
+                            _unused = function(*args)
 
         return storage[x]
 
