@@ -1,3 +1,4 @@
+#define TORCH_ASSERT_ONLY_METHOD_OPERATORS
 #include <torch/csrc/jit/serialization/flatbuffer_serializer.h>
 
 #include <c10/core/CPUAllocator.h>
@@ -8,6 +9,12 @@
 #include <torch/csrc/jit/runtime/instruction.h>
 #include <torch/csrc/jit/serialization/export.h>
 #include <string>
+
+#ifndef AT_PER_OPERATOR_HEADERS
+#include <ATen/Functions.h>
+#else
+#include <ATen/ops/empty.h>
+#endif
 
 namespace torch {
 namespace jit {
